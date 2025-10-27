@@ -108,15 +108,10 @@ fun AppNavigation() {
                             isLoading = true
                             val firebaseRepo = FirebaseSyncRepository()
                             val success = firebaseRepo.joinFamily(code)
-                            isLoading = false
                             
                             if (success) {
-                                // После успешной связки сохраняем статус
-                                linkPreferences.setLinked(true)
-                                
                                 // Получаем familyId из Firebase для ребенка
-                                val firebaseRepo2 = FirebaseSyncRepository()
-                                val query = firebaseRepo2.db.collection("families")
+                                val query = firebaseRepo.db.collection("families")
                                     .whereEqualTo("connectionCode", code)
                                     .limit(1)
                                     .get()
@@ -126,11 +121,14 @@ fun AppNavigation() {
                                     val family = query.documents.first().toObject(FamilyLink::class.java)
                                     if (family != null) {
                                         linkPreferences.setFamilyId(family.familyId)
+                                        linkPreferences.setLinked(true)
                                     }
                                 }
                                 
+                                isLoading = false
                                 navController.popBackStack()
                             } else {
+                                isLoading = false
                                 errorMessage = "Код неверный или уже использован"
                             }
                         } catch (e: Exception) {

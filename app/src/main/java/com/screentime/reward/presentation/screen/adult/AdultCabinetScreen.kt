@@ -33,19 +33,22 @@ fun AdultCabinetScreen(
     
     // Проверяем статус связки в Firebase
     LaunchedEffect(familyId) {
-        if (familyId != null) {
-            val firebaseRepo = com.screentime.reward.data.firebase.FirebaseSyncRepository()
-            try {
-                val familySnapshot = firebaseRepo.db.collection("families")
-                    .document(familyId!!)
-                    .get()
-                    .await()
-                
-                val family: FamilyLink? = familySnapshot.toObject(FamilyLink::class.java)
-                firebaseLinked = family?.isActive == true
-            } catch (e: Exception) {
-                firebaseLinked = false
+        while (true) {
+            if (familyId != null) {
+                val firebaseRepo = com.screentime.reward.data.firebase.FirebaseSyncRepository()
+                try {
+                    val familySnapshot = firebaseRepo.db.collection("families")
+                        .document(familyId!!)
+                        .get()
+                        .await()
+                    
+                    val family: FamilyLink? = familySnapshot.toObject(FamilyLink::class.java)
+                    firebaseLinked = family?.isActive == true
+                } catch (e: Exception) {
+                    firebaseLinked = false
+                }
             }
+            kotlinx.coroutines.delay(2000) // Проверяем каждые 2 секунды
         }
     }
     
