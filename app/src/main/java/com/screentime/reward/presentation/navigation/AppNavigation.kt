@@ -15,6 +15,7 @@ import com.screentime.reward.domain.model.FamilyLink
 import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withTimeout
 import android.util.Log
 
 @Composable
@@ -84,17 +85,30 @@ fun AppNavigation() {
                 if (role == UserRole.ADULT && connectionCode == null) {
                     try {
                         isLoading = true
+                        android.util.Log.d("AppNavigation", "Starting family creation")
+                        
                         val firebaseRepo = FirebaseSyncRepository(context)
+                        android.util.Log.d("AppNavigation", "FirebaseRepo created")
+                        
                         val code = firebaseRepo.generateConnectionCode()
+                        android.util.Log.d("AppNavigation", "Code generated: $code")
+                        
                         connectionCode = code
                         
-                        val familyId = firebaseRepo.createFamilySync(code)
+                        android.util.Log.d("AppNavigation", "Creating family in Firebase")
+                        val familyId = withTimeout(10000) { // 10 секунд таймаут
+                            firebaseRepo.createFamilySync(code)
+                        }
+                        android.util.Log.d("AppNavigation", "Family created with ID: $familyId")
+                        
                         linkPreferences.setFamilyId(familyId)
+                        android.util.Log.d("AppNavigation", "Family ID saved")
+                        
                         isLoading = false
                     } catch (e: Exception) {
+                        android.util.Log.e("AppNavigation", "Error creating family", e)
                         errorMessage = "Ошибка: ${e.message}"
                         isLoading = false
-                        android.util.Log.e("AppNavigation", "Error creating family", e)
                     }
                 }
             }
