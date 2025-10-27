@@ -26,12 +26,26 @@ import javax.inject.Inject
 fun ChildCabinetScreen(
     onBackClick: () -> Unit,
     onLinkDevices: () -> Unit = {},
-    viewModel: ChildViewModel = hiltViewModel(),
-    linkPreferences: LinkPreferences = LinkPreferences(androidx.compose.ui.platform.LocalContext.current)
+    viewModel: ChildViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var showAddDialog by remember { mutableStateOf(false) }
+    val linkPreferences = LinkPreferences(androidx.compose.ui.platform.LocalContext.current)
     val isLinked by linkPreferences.isLinkedFlow().collectAsState(initial = false)
+    
+    // Получаем familyId для проверки связки в Firebase
+    val familyId by linkPreferences.getFamilyIdFlow().collectAsState(initial = null)
+    var firebaseLinked by remember { mutableStateOf(false) }
+    
+    LaunchedEffect(familyId) {
+        if (familyId != null) {
+            val firebaseRepo = com.screentime.reward.data.firebase.FirebaseSyncRepository()
+            // TODO: проверить статус связки в Firebase
+            firebaseLinked = true // Пока заглушка
+        }
+    }
+    
+    val isDeviceLinked = isLinked || firebaseLinked
     
     Scaffold(
         topBar = {
@@ -69,7 +83,7 @@ fun ChildCabinetScreen(
         ) {
             // Карточка статуса связи
             Spacer(modifier = Modifier.height(8.dp))
-            LinkStatusCard(isLinked = isLinked)
+            LinkStatusCard(isLinked = isDeviceLinked)
             Spacer(modifier = Modifier.height(16.dp))
             
             // Карточка с доступным временем

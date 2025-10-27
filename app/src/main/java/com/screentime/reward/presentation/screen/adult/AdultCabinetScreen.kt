@@ -28,6 +28,20 @@ fun AdultCabinetScreen(
     val linkPreferences = LinkPreferences(LocalContext.current)
     val isLinked by linkPreferences.isLinkedFlow().collectAsState(initial = false)
     
+    // Получаем familyId для проверки связки в Firebase
+    val familyId by linkPreferences.getFamilyIdFlow().collectAsState(initial = null)
+    var firebaseLinked by remember { mutableStateOf(false) }
+    
+    LaunchedEffect(familyId) {
+        if (familyId != null) {
+            val firebaseRepo = com.screentime.reward.data.firebase.FirebaseSyncRepository()
+            // TODO: проверить статус связки в Firebase  
+            firebaseLinked = true // Пока заглушка
+        }
+    }
+    
+    val isDeviceLinked = isLinked || firebaseLinked
+    
     Scaffold(
         topBar = {
             TopAppBar(
@@ -57,7 +71,7 @@ fun AdultCabinetScreen(
         ) {
             // Карточка статуса связи
             Spacer(modifier = Modifier.height(8.dp))
-            LinkStatusCard(isLinked = isLinked)
+            LinkStatusCard(isLinked = isDeviceLinked)
             Spacer(modifier = Modifier.height(16.dp))
             
             Text(
