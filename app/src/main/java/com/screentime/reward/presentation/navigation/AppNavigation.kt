@@ -87,24 +87,25 @@ fun AppNavigation() {
                         isLoading = true
                         android.util.Log.d("AppNavigation", "Starting family creation")
                         
+                        // Сначала просто генерируем код БЕЗ Firebase
                         val firebaseRepo = FirebaseSyncRepository(context)
-                        android.util.Log.d("AppNavigation", "FirebaseRepo created")
-                        
                         val code = firebaseRepo.generateConnectionCode()
                         android.util.Log.d("AppNavigation", "Code generated: $code")
                         
                         connectionCode = code
-                        
-                        android.util.Log.d("AppNavigation", "Creating family in Firebase")
-                        val familyId = withTimeout(10000) { // 10 секунд таймаут
-                            firebaseRepo.createFamilySync(code)
-                        }
-                        android.util.Log.d("AppNavigation", "Family created with ID: $familyId")
-                        
-                        linkPreferences.setFamilyId(familyId)
-                        android.util.Log.d("AppNavigation", "Family ID saved")
-                        
                         isLoading = false
+                        
+                        // Пытаемся создать в Firebase в фоне (не блокируем UI)
+                        scope.launch {
+                            try {
+                                android.util.Log.d("AppNavigation", "Creating family in Firebase")
+                                val familyId = firebaseRepo.createFamilySync(code)
+                                android.util.Log.d("AppNavigation", "Family created with ID: $familyId")
+                                linkPreferences.setFamilyId(familyId)
+                            } catch (e: Exception) {
+                                android.util.Log.e("AppNavigation", "Firebase error (non-blocking)", e)
+                            }
+                        }
                     } catch (e: Exception) {
                         android.util.Log.e("AppNavigation", "Error creating family", e)
                         errorMessage = "Ошибка: ${e.message}"
@@ -122,34 +123,47 @@ fun AppNavigation() {
                     scope.launch {
                         try {
                             isLoading = true
-                            val firebaseRepo = FirebaseSyncRepository(context)
-                            val success = firebaseRepo.joinFamily(code)
-                            
-                            if (success) {
-                                // Получаем familyId из Firebase для ребенка
-                                val query = firebaseRepo.db.collection("families")
-                                    .whereEqualTo("connectionCode", code)
-                                    .limit(1)
-                                    .get()
-                                    .await()
-                                
-                                if (!query.isEmpty) {
-                                    val family = query.documents.first().toObject(FamilyLink::class.java)
-                                    if (family != null) {
-                                        linkPreferences.setFamilyId(family.familyId)
-                                        linkPreferences.setLinked(true)
-                                    }
+                            try {
+                                val firebaseRepo = FirebaseSyncRepository(context)
+                                val success = withTimeout(5000) {
+                                    firebaseRepo.joinFamily(code)
                                 }
-                                
+                            
+                                if (success) {
+                                    // Получаем familyId из Firebase для ребенка
+                                    val query = firebaseRepo.db.collection("families")
+                                        .whereEqualTo("connectionCode", code)
+                                        .limit(1)
+                                        .get()
+                                        .await()
+                                    
+                                    if (!query.isEmpty) {
+                                        val family = query.documents.first().toObject(FamilyLink::class.java)
+                                        if (family != null) {
+                                            linkPreferences.setFamilyId(family.familyId)
+                                            linkPreferences.setLinked(true)
+                                        }
+                                    }
+                                    
+                                    isLoading = false
+                                    navController.popBackStack()
+                                } else {
+                                    isLoading = false
+                                    errorMessage = "Код неверный или уже использован"
+                                }
+                            } catch (e: java.util.concurrent.TimeoutCancellationException) {
                                 isLoading = false
-                                navController.popBackStack()
-                            } else {
+                                errorMessage = "Ошибка сети: превышено время ожидания"
+                                android.util.Log.e("AppNavigation", "Timeout", e)
+                            } catch (e: Exception) {
                                 isLoading = false
-                                errorMessage = "Код неверный или уже использован"
+                                errorMessage = "Ошибка: ${e.message}"
+                                android.util.Log.e("AppNavigation", "Error joining family", e)
                             }
                         } catch (e: Exception) {
                             isLoading = false
-                            errorMessage = "Ошибка: ${e.message}"
+                            errorMessage = "Не удалось соединиться с Firebase"
+                            android.util.Log.e("AppNavigation", "Unable to create Firebase repo", e)
                         }
                     }
                 },
