@@ -63,7 +63,7 @@ fun AdultCabinetScreen(
     val isDeviceLinked = firebaseLinked
     
     // Функция принудительного обновления статуса
-    val refreshConnection = {
+    val refreshConnection: () -> Unit = {
         scope.launch {
             checkConnectionStatus()
         }
