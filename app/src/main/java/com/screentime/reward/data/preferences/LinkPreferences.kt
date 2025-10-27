@@ -44,5 +44,9 @@ class LinkPreferences @Inject constructor(
             preferences[FAMILY_ID_KEY] = familyId
         }
     }
+    
+    suspend fun getFamilyId(): String? {
+        return dataStore.data.first()[FAMILY_ID_KEY]
+    }
 }
 

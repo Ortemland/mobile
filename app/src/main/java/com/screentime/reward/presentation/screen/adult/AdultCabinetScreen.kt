@@ -34,7 +34,7 @@ fun AdultCabinetScreen(
     
     // Функция для проверки статуса связки
     suspend fun checkConnectionStatus() {
-        val currentFamilyId = linkPreferences.getFamilyIdFlow().collectAsState(initial = null).value
+        val currentFamilyId = linkPreferences.getFamilyId()
         if (currentFamilyId != null) {
             val firebaseRepo = com.screentime.reward.data.firebase.FirebaseSyncRepository()
             try {
