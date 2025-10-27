@@ -1,5 +1,7 @@
 package com.screentime.reward.data.firebase
 
+import android.content.Context
+import android.content.SharedPreferences
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -13,9 +15,15 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class FirebaseSyncRepository @Inject constructor() {
+class FirebaseSyncRepository @Inject constructor(
+    private val context: Context
+) {
     
     val db: FirebaseFirestore = Firebase.firestore
+    
+    private val sharedPrefs: SharedPreferences by lazy {
+        context.getSharedPreferences("device_prefs", Context.MODE_PRIVATE)
+    }
     
     // Генерация случайного кода связки (6 цифр)
     fun generateConnectionCode(): String {
@@ -116,9 +124,14 @@ class FirebaseSyncRepository @Inject constructor() {
         }
     }
     
-    // Получить текущий ID устройства (упрощенная версия)
+    // Получить текущий ID устройства - постоянный для этого устройства
     private fun getCurrentDeviceId(): String {
-        // В реальном приложении используй Settings.Secure.ANDROID_ID
-        return java.util.UUID.randomUUID().toString()
+        val deviceIdKey = "device_id"
+        
+        return sharedPrefs.getString(deviceIdKey, null) ?: run {
+            val newDeviceId = java.util.UUID.randomUUID().toString()
+            sharedPrefs.edit().putString(deviceIdKey, newDeviceId).apply()
+            newDeviceId
+        }
     }
 }
