@@ -25,30 +25,6 @@ fun AppNavigation() {
                         UserRole.CHILD -> navController.navigate("child_cabinet")
                         UserRole.ADULT -> navController.navigate("adult_cabinet")
                     }
-                },
-                onFamilyLinkNeeded = { role ->
-                    navController.navigate("family_link/$role")
-                }
-            )
-        }
-        
-        composable("family_link/{role}") { backStackEntry ->
-            val roleString = backStackEntry.arguments?.getString("role") ?: "CHILD"
-            val role = when (roleString) {
-                "ADULT" -> UserRole.ADULT
-                "CHILD" -> UserRole.CHILD
-                else -> UserRole.CHILD
-            }
-            
-            var connectionCode by remember { mutableStateOf<String?>(null) }
-            
-            FamilyLinkScreen(
-                role = role,
-                connectionCode = connectionCode,
-                onCodeEntered = { code ->
-                    // Логика соединения устройств
-                    // TODO: вызывать Firebase
-                    navController.navigate("${roleString.lowercase()}_cabinet")
                 }
             )
         }

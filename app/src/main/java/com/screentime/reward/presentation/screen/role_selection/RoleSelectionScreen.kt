@@ -15,13 +15,6 @@ fun RoleSelectionScreen(
     onRoleSelected: (UserRole) -> Unit,
     onFamilyLinkNeeded: ((UserRole) -> Unit)? = null
 ) {
-    var showFamilyLink by remember { mutableStateOf<UserRole?>(null) }
-    
-    if (showFamilyLink != null && onFamilyLinkNeeded != null) {
-        // Показываем экран связи
-        onFamilyLinkNeeded(showFamilyLink!!)
-        return
-    }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -46,11 +39,7 @@ fun RoleSelectionScreen(
         RoleButton(
             text = "Ребенок",
             onClick = { 
-                if (onFamilyLinkNeeded != null) {
-                    showFamilyLink = UserRole.CHILD
-                } else {
-                    onRoleSelected(UserRole.CHILD)
-                }
+                onRoleSelected(UserRole.CHILD)
             },
             modifier = Modifier.fillMaxWidth()
         )
@@ -60,11 +49,7 @@ fun RoleSelectionScreen(
         RoleButton(
             text = "Взрослый",
             onClick = {
-                if (onFamilyLinkNeeded != null) {
-                    showFamilyLink = UserRole.ADULT
-                } else {
-                    onRoleSelected(UserRole.ADULT)
-                }
+                onRoleSelected(UserRole.ADULT)
             },
             modifier = Modifier.fillMaxWidth()
         )
