@@ -9,6 +9,9 @@ import com.screentime.reward.presentation.screen.role_selection.RoleSelectionScr
 import com.screentime.reward.presentation.screen.child.ChildCabinetScreen
 import com.screentime.reward.presentation.screen.adult.AdultCabinetScreen
 import com.screentime.reward.presentation.screen.family.FamilyLinkScreen
+import com.screentime.reward.data.preferences.LinkPreferences
+import androidx.compose.ui.platform.LocalContext
+import kotlinx.coroutines.launch
 
 @Composable
 fun AppNavigation() {
@@ -69,16 +72,20 @@ fun AppNavigation() {
                 connectionCode = (100000..999999).random().toString()
             }
             
+            val linkPreferences = remember { LinkPreferences(LocalContext.current) }
+            val scope = rememberCoroutineScope()
+            
             FamilyLinkScreen(
                 role = role,
                 connectionCode = connectionCode,
                 onCodeEntered = { code ->
-                    // TODO: Логика связки устройств через Firebase
-                    // После успешной связки вернуться в кабинет
+                    // Логика связки устройств
+                    scope.launch {
+                        linkPreferences.setLinked(true)
+                    }
                     navController.popBackStack()
                 },
                 onBack = {
-                    // Возвращаемся в соответствующий кабинет
                     navController.popBackStack()
                 }
             )

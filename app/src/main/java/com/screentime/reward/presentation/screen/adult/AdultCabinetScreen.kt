@@ -14,6 +14,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.screentime.reward.domain.model.Task
 import com.screentime.reward.presentation.screen.adult.viewmodel.AdultViewModel
 import com.screentime.reward.presentation.screen.shared.LinkStatusCard
+import com.screentime.reward.data.preferences.LinkPreferences
+import androidx.compose.ui.platform.LocalContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -23,7 +25,8 @@ fun AdultCabinetScreen(
     viewModel: AdultViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    var isLinked by remember { mutableStateOf(false) }
+    val linkPreferences = remember { LinkPreferences(LocalContext.current) }
+    val isLinked by linkPreferences.isLinkedFlow().collectAsState(initial = false)
     
     Scaffold(
         topBar = {

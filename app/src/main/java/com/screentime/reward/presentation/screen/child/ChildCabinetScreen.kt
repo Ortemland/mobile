@@ -17,17 +17,21 @@ import com.screentime.reward.domain.model.Task
 import com.screentime.reward.domain.model.TaskStatus
 import com.screentime.reward.presentation.screen.child.viewmodel.ChildViewModel
 import com.screentime.reward.presentation.screen.shared.LinkStatusCard
+import com.screentime.reward.data.preferences.LinkPreferences
+import androidx.hilt.navigation.compose.hiltViewModel
+import javax.inject.Inject
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChildCabinetScreen(
     onBackClick: () -> Unit,
     onLinkDevices: () -> Unit = {},
-    viewModel: ChildViewModel = hiltViewModel()
+    viewModel: ChildViewModel = hiltViewModel(),
+    linkPreferences: LinkPreferences = remember { LinkPreferences(androidx.compose.ui.platform.LocalContext.current) }
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var showAddDialog by remember { mutableStateOf(false) }
-    var isLinked by remember { mutableStateOf(false) }
+    val isLinked by linkPreferences.isLinkedFlow().collectAsState(initial = false)
     
     Scaffold(
         topBar = {

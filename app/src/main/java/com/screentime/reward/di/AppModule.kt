@@ -38,6 +38,12 @@ object AppModule {
     
     @Provides
     @Singleton
+    fun provideLinkPreferences(@ApplicationContext context: Context): com.screentime.reward.data.preferences.LinkPreferences {
+        return com.screentime.reward.data.preferences.LinkPreferences(context)
+    }
+    
+    @Provides
+    @Singleton
     fun provideTaskRepository(
         taskDao: TaskDao,
         preferences: AppPreferences
