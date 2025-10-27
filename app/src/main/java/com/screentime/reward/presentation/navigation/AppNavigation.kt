@@ -15,6 +15,7 @@ import com.screentime.reward.domain.model.FamilyLink
 import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import android.util.Log
 
 @Composable
 fun AppNavigation() {
@@ -79,20 +80,24 @@ fun AppNavigation() {
             val context = LocalContext.current
             
             // Создаем семью для взрослого
-            LaunchedEffect(Unit) {
+            LaunchedEffect(role, connectionCode) {
                 if (role == UserRole.ADULT && connectionCode == null) {
                     try {
+                        isLoading = true
                         val firebaseRepo = FirebaseSyncRepository(context)
                         val code = firebaseRepo.generateConnectionCode()
                         connectionCode = code
                         
-                        isLoading = true
+                        // Небольшая задержка перед созданием семьи в Firebase
+                        kotlinx.coroutines.delay(500)
+                        
                         val familyId = firebaseRepo.createFamilySync(code)
                         linkPreferences.setFamilyId(familyId)
                         isLoading = false
                     } catch (e: Exception) {
                         errorMessage = "Ошибка: ${e.message}"
                         isLoading = false
+                        android.util.Log.e("AppNavigation", "Error creating family", e)
                     }
                 }
             }
