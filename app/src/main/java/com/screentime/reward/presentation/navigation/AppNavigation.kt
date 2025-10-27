@@ -80,16 +80,13 @@ fun AppNavigation() {
             val context = LocalContext.current
             
             // Создаем семью для взрослого
-            LaunchedEffect(role, connectionCode) {
+            LaunchedEffect(Unit) {
                 if (role == UserRole.ADULT && connectionCode == null) {
                     try {
                         isLoading = true
                         val firebaseRepo = FirebaseSyncRepository(context)
                         val code = firebaseRepo.generateConnectionCode()
                         connectionCode = code
-                        
-                        // Небольшая задержка перед созданием семьи в Firebase
-                        kotlinx.coroutines.delay(500)
                         
                         val familyId = firebaseRepo.createFamilySync(code)
                         linkPreferences.setFamilyId(familyId)
