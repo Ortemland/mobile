@@ -86,11 +86,9 @@ fun AppNavigation() {
                         // Создаем семью в Firebase
                         scope.launch {
                             isLoading = true
-                            firebaseRepo.createFamily(code) { familyId ->
-                                // Сохраняем familyId для взрослого
-                                linkPreferences.setFamilyId(familyId)
-                                linkPreferences.setLinked(true)
-                            }
+                            val familyId = firebaseRepo.createFamilySync(code)
+                            linkPreferences.setFamilyId(familyId)
+                            linkPreferences.setLinked(true)
                             isLoading = false
                         }
                     } catch (e: Exception) {

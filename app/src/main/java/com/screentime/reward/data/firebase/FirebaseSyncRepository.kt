@@ -22,8 +22,8 @@ class FirebaseSyncRepository @Inject constructor() {
         return (100000..999999).random().toString()
     }
     
-    // Создать семью (взрослый создает)
-    suspend fun createFamily(connectionCode: String, onSuccess: (String) -> Unit = {}) {
+    // Создать семью (взрослый создает) - возвращает familyId
+    suspend fun createFamilySync(connectionCode: String): String {
         val familyId = db.collection("families").document().id
         val familyLink = FamilyLink(
             familyId = familyId,
@@ -38,7 +38,7 @@ class FirebaseSyncRepository @Inject constructor() {
             .set(familyLink)
             .await()
         
-        onSuccess(familyId)
+        return familyId
     }
     
     // Присоединиться к семье (ребенок вводит код)
