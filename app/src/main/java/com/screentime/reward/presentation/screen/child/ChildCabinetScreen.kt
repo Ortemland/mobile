@@ -34,13 +34,14 @@ fun ChildCabinetScreen(
     var firebaseLinked by remember { mutableStateOf(false) }
     
     // Проверяем статус связки в Firebase с периодическим обновлением
-    LaunchedEffect(familyId) {
+    LaunchedEffect(Unit) {
         while (true) {
-            if (familyId != null) {
+            val currentFamilyId = linkPreferences.getFamilyIdFlow().collectAsState(initial = null).value
+            if (currentFamilyId != null) {
                 val firebaseRepo = com.screentime.reward.data.firebase.FirebaseSyncRepository()
                 try {
                     val familySnapshot = firebaseRepo.db.collection("families")
-                        .document(familyId!!)
+                        .document(currentFamilyId)
                         .get()
                         .await()
                     
@@ -55,6 +56,27 @@ fun ChildCabinetScreen(
     }
     
     val isDeviceLinked = firebaseLinked
+    
+    // Функция принудительного обновления статуса
+    val refreshConnection = {
+        scope.launch {
+            val currentFamilyId = linkPreferences.getFamilyIdFlow().collectAsState(initial = null).value
+            if (currentFamilyId != null) {
+                val firebaseRepo = com.screentime.reward.data.firebase.FirebaseSyncRepository()
+                try {
+                    val familySnapshot = firebaseRepo.db.collection("families")
+                        .document(currentFamilyId)
+                        .get()
+                        .await()
+                    
+                    val family: com.screentime.reward.domain.model.FamilyLink? = familySnapshot.toObject(com.screentime.reward.domain.model.FamilyLink::class.java)
+                    firebaseLinked = family?.isActive == true
+                } catch (e: Exception) {
+                    firebaseLinked = false
+                }
+            }
+        }
+    }
     
     Scaffold(
         topBar = {
@@ -92,7 +114,10 @@ fun ChildCabinetScreen(
         ) {
             // Карточка статуса связи
             Spacer(modifier = Modifier.height(8.dp))
-            LinkStatusCard(isLinked = isDeviceLinked)
+            LinkStatusCard(
+                isLinked = isDeviceLinked,
+                onRefresh = { /* refreshConnection() */ }
+            )
             Spacer(modifier = Modifier.height(16.dp))
             
             // Карточка с доступным временем

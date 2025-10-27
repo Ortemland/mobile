@@ -77,22 +77,21 @@ fun AppNavigation() {
             val linkPreferences = LinkPreferences(LocalContext.current)
             val scope = rememberCoroutineScope()
             
-            LaunchedEffect(role) {
+            // Создаем семью для взрослого
+            LaunchedEffect(Unit) {
                 if (role == UserRole.ADULT && connectionCode == null) {
                     try {
                         val firebaseRepo = FirebaseSyncRepository()
                         val code = firebaseRepo.generateConnectionCode()
                         connectionCode = code
-                        // Создаем семью в Firebase
-                        scope.launch {
-                            isLoading = true
-                            val familyId = firebaseRepo.createFamilySync(code)
-                            linkPreferences.setFamilyId(familyId)
-                            linkPreferences.setLinked(true)
-                            isLoading = false
-                        }
+                        
+                        isLoading = true
+                        val familyId = firebaseRepo.createFamilySync(code)
+                        linkPreferences.setFamilyId(familyId)
+                        isLoading = false
                     } catch (e: Exception) {
                         errorMessage = "Ошибка: ${e.message}"
+                        isLoading = false
                     }
                 }
             }

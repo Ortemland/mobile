@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Error
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -16,7 +17,8 @@ import androidx.compose.ui.unit.sp
 @Composable
 fun LinkStatusCard(
     isLinked: Boolean = false,
-    onLinkClick: () -> Unit = {}
+    onLinkClick: () -> Unit = {},
+    onRefresh: () -> Unit = {}
 ) {
     if (!isLinked) {
         Card(
@@ -57,6 +59,14 @@ fun LinkStatusCard(
                             color = MaterialTheme.colorScheme.onErrorContainer.copy(alpha = 0.7f)
                         )
                     }
+                }
+                
+                IconButton(onClick = onRefresh) {
+                    Icon(
+                        imageVector = Icons.Default.Refresh,
+                        contentDescription = "Обновить",
+                        tint = MaterialTheme.colorScheme.onErrorContainer
+                    )
                 }
             }
         }
@@ -99,6 +109,14 @@ fun LinkStatusCard(
                             color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
                         )
                     }
+                }
+                
+                IconButton(onClick = onRefresh) {
+                    Icon(
+                        imageVector = Icons.Default.Refresh,
+                        contentDescription = "Обновить",
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
                 }
             }
         }
