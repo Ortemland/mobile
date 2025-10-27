@@ -76,12 +76,13 @@ fun AppNavigation() {
             
             val linkPreferences = LinkPreferences(LocalContext.current)
             val scope = rememberCoroutineScope()
+            val context = LocalContext.current
             
             // Создаем семью для взрослого
             LaunchedEffect(Unit) {
                 if (role == UserRole.ADULT && connectionCode == null) {
                     try {
-                        val firebaseRepo = FirebaseSyncRepository(LocalContext.current)
+                        val firebaseRepo = FirebaseSyncRepository(context)
                         val code = firebaseRepo.generateConnectionCode()
                         connectionCode = code
                         
@@ -105,7 +106,7 @@ fun AppNavigation() {
                     scope.launch {
                         try {
                             isLoading = true
-                            val firebaseRepo = FirebaseSyncRepository(LocalContext.current)
+                            val firebaseRepo = FirebaseSyncRepository(context)
                             val success = firebaseRepo.joinFamily(code)
                             
                             if (success) {
