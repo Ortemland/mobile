@@ -35,12 +35,12 @@ fun AdultCabinetScreen(
         if (familyId != null) {
             val firebaseRepo = com.screentime.reward.data.firebase.FirebaseSyncRepository()
             try {
-                val family = firebaseRepo.db.collection("families")
+                val familySnapshot = firebaseRepo.db.collection("families")
                     .document(familyId!!)
                     .get()
                     .await()
-                    .toObject(FamilyLink::class.java)
                 
+                val family = familySnapshot.toObject(FamilyLink::class.java)
                 firebaseLinked = family?.isActive == true
             } catch (e: Exception) {
                 firebaseLinked = false
