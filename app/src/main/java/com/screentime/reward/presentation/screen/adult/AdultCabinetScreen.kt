@@ -16,6 +16,7 @@ import com.screentime.reward.presentation.screen.adult.viewmodel.AdultViewModel
 import com.screentime.reward.presentation.screen.shared.LinkStatusCard
 import com.screentime.reward.data.preferences.LinkPreferences
 import androidx.compose.ui.platform.LocalContext
+import kotlinx.coroutines.tasks.await
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -26,21 +27,28 @@ fun AdultCabinetScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val linkPreferences = LinkPreferences(LocalContext.current)
-    val isLinked by linkPreferences.isLinkedFlow().collectAsState(initial = false)
-    
-    // Получаем familyId для проверки связки в Firebase
     val familyId by linkPreferences.getFamilyIdFlow().collectAsState(initial = null)
     var firebaseLinked by remember { mutableStateOf(false) }
     
+    // Проверяем статус связки в Firebase
     LaunchedEffect(familyId) {
         if (familyId != null) {
             val firebaseRepo = com.screentime.reward.data.firebase.FirebaseSyncRepository()
-            // TODO: проверить статус связки в Firebase  
-            firebaseLinked = true // Пока заглушка
+            try {
+                val family = firebaseRepo.db.collection("families")
+                    .document(familyId!!)
+                    .get()
+                    .await()
+                    .toObject(FamilyLink::class.java)
+                
+                firebaseLinked = family?.isActive == true
+            } catch (e: Exception) {
+                firebaseLinked = false
+            }
         }
     }
     
-    val isDeviceLinked = isLinked || firebaseLinked
+    val isDeviceLinked = firebaseLinked
     
     Scaffold(
         topBar = {
