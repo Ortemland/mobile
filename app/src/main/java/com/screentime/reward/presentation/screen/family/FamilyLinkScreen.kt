@@ -45,10 +45,10 @@ fun FamilyLinkScreen(
                 .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
-        ) {
-            if (role == UserRole.ADULT && connectionCode != null) {
-                // Взрослый видит код для связи
-                AdultConnectionCodeView(connectionCode = connectionCode)
+    ) {
+        if (role == UserRole.ADULT && connectionCode != null) {
+            // Взрослый видит код для связи
+            AdultConnectionCodeView(connectionCode = connectionCode, onBack = onBack)
             } else if (role == UserRole.CHILD) {
                 // Ребенок вводит код
                 ChildCodeInputView(onCodeEntered = onCodeEntered)
@@ -58,7 +58,10 @@ fun FamilyLinkScreen(
 }
 
 @Composable
-fun AdultConnectionCodeView(connectionCode: String) {
+fun AdultConnectionCodeView(
+    connectionCode: String,
+    onBack: () -> Unit = {}
+) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
@@ -95,14 +98,26 @@ fun AdultConnectionCodeView(connectionCode: String) {
         }
     }
     
-    Spacer(modifier = Modifier.height(32.dp))
-    
-    Text(
-        text = "После ввода кода ребенком,\nустройства будут связаны",
-        fontSize = 12.sp,
-        textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-    )
+            Spacer(modifier = Modifier.height(32.dp))
+            
+            Text(
+                text = "После ввода кода ребенком,\nустройства будут связаны",
+                fontSize = 12.sp,
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+            )
+            
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            Button(
+                onClick = onBack,
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.secondary
+                )
+            ) {
+                Text("Готово, вернуться в кабинет")
+            }
 }
 
 @Composable

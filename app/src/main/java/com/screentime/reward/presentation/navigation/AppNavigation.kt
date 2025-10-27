@@ -78,6 +78,7 @@ fun AppNavigation() {
                     navController.popBackStack()
                 },
                 onBack = {
+                    // Возвращаемся в соответствующий кабинет
                     navController.popBackStack()
                 }
             )
