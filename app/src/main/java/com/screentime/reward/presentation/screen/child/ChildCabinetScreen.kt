@@ -36,6 +36,11 @@ fun ChildCabinetScreen(
                         Text("Назад", color = MaterialTheme.colorScheme.onPrimary)
                     }
                 },
+                actions = {
+                    TextButton(onClick = onLinkDevices) {
+                        Text("Связать", color = MaterialTheme.colorScheme.onPrimary)
+                    }
+                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primary,
                     titleContentColor = MaterialTheme.colorScheme.onPrimary
