@@ -43,7 +43,7 @@ fun ChildCabinetScreen(
                     .get()
                     .await()
                 
-                val family = familySnapshot.toObject(FamilyLink::class.java)
+                val family: com.screentime.reward.domain.model.FamilyLink? = familySnapshot.toObject(com.screentime.reward.domain.model.FamilyLink::class.java)
                 firebaseLinked = family?.isActive == true
             } catch (e: Exception) {
                 firebaseLinked = false

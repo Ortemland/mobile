@@ -15,6 +15,7 @@ import com.screentime.reward.domain.model.Task
 import com.screentime.reward.presentation.screen.adult.viewmodel.AdultViewModel
 import com.screentime.reward.presentation.screen.shared.LinkStatusCard
 import com.screentime.reward.data.preferences.LinkPreferences
+import com.screentime.reward.domain.model.FamilyLink
 import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.tasks.await
 
@@ -40,7 +41,7 @@ fun AdultCabinetScreen(
                     .get()
                     .await()
                 
-                val family = familySnapshot.toObject(FamilyLink::class.java)
+                val family: FamilyLink? = familySnapshot.toObject(FamilyLink::class.java)
                 firebaseLinked = family?.isActive == true
             } catch (e: Exception) {
                 firebaseLinked = false
