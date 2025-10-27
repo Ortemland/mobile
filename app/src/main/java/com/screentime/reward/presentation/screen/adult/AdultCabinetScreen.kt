@@ -32,13 +32,13 @@ fun AdultCabinetScreen(
     val familyId by linkPreferences.getFamilyIdFlow().collectAsState(initial = null)
     var firebaseLinked by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
     
     // Функция для проверки статуса связки
     suspend fun checkConnectionStatus() {
         val currentFamilyId = linkPreferences.getFamilyId()
         if (currentFamilyId != null) {
-            val contextForRepo = LocalContext.current
-            val firebaseRepo = com.screentime.reward.data.firebase.FirebaseSyncRepository(contextForRepo)
+            val firebaseRepo = com.screentime.reward.data.firebase.FirebaseSyncRepository(context)
             try {
                 val familySnapshot = firebaseRepo.db.collection("families")
                     .document(currentFamilyId)
