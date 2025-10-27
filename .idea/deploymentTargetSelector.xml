@@ -4,10 +4,10 @@
     <selectionStates>
       <SelectionState runConfigName="ScreenTimeReward.app">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2025-10-27T15:24:37.079367Z">
+        <DropdownSelection timestamp="2025-10-27T15:37:13.463418Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="LocalEmulator" identifier="path=/Users/artemsocnev/.android/avd/Medium_Phone.avd" />
+              <DeviceId pluginId="LocalEmulator" identifier="path=/Users/artemsocnev/.android/avd/Pixel_8_Pro.avd" />
             </handle>
           </Target>
         </DropdownSelection>
