@@ -2,6 +2,7 @@ package com.screentime.reward.data.firebase
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -32,19 +33,26 @@ class FirebaseSyncRepository @Inject constructor(
     
     // Создать семью (взрослый создает) - возвращает familyId
     suspend fun createFamilySync(connectionCode: String): String {
+        val deviceId = getCurrentDeviceId()
+        android.util.Log.d("FirebaseSync", "Current device ID: $deviceId")
+        
         val familyId = db.collection("families").document().id
         val familyLink = FamilyLink(
             familyId = familyId,
-            adultDeviceId = getCurrentDeviceId(),
+            adultDeviceId = deviceId,
             childDeviceId = null,
             connectionCode = connectionCode,
             isActive = false
         )
         
+        android.util.Log.d("FirebaseSync", "Creating family with ID: $familyId, code: $connectionCode")
+        
         db.collection("families")
             .document(familyId)
             .set(familyLink)
             .await()
+        
+        android.util.Log.d("FirebaseSync", "Family created successfully")
         
         return familyId
     }
@@ -128,10 +136,14 @@ class FirebaseSyncRepository @Inject constructor(
     private fun getCurrentDeviceId(): String {
         val deviceIdKey = "device_id"
         
-        return sharedPrefs.getString(deviceIdKey, null) ?: run {
+        val deviceId = sharedPrefs.getString(deviceIdKey, null) ?: run {
             val newDeviceId = java.util.UUID.randomUUID().toString()
             sharedPrefs.edit().putString(deviceIdKey, newDeviceId).apply()
+            android.util.Log.d("FirebaseSync", "Generated new device ID: $newDeviceId")
             newDeviceId
         }
+        
+        android.util.Log.d("FirebaseSync", "Using device ID: $deviceId")
+        return deviceId
     }
 }

@@ -91,11 +91,10 @@ dependencies {
     // DataStore
     implementation("androidx.datastore:datastore-preferences:1.0.0")
     
-    // Firebase
-    implementation(platform("com.google.firebase:firebase-bom:32.7.0"))
-    implementation("com.google.firebase:firebase-firestore-ktx")
-    implementation("com.google.firebase:firebase-auth-ktx")
-    implementation("com.google.firebase:firebase-messaging-ktx")
+            // Firebase
+            implementation(platform("com.google.firebase:firebase-bom:32.7.0"))
+            implementation("com.google.firebase:firebase-firestore-ktx")
+            // Firebase Messaging отключен из-за ошибок инициализации на эмуляторе
     
     // ZXing для QR кодов
     implementation("com.google.zxing:core:3.5.2")
