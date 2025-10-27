@@ -2,6 +2,7 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("dagger.hilt.android.plugin")
+    id("com.google.gms.google-services")
     kotlin("kapt")
 }
 
@@ -89,6 +90,16 @@ dependencies {
     
     // DataStore
     implementation("androidx.datastore:datastore-preferences:1.0.0")
+    
+    // Firebase
+    implementation(platform("com.google.firebase:firebase-bom:32.7.0"))
+    implementation("com.google.firebase:firebase-firestore-ktx")
+    implementation("com.google.firebase:firebase-auth-ktx")
+    implementation("com.google.firebase:firebase-messaging-ktx")
+    
+    // ZXing для QR кодов
+    implementation("com.google.zxing:core:3.5.2")
+    implementation("com.journeyapps:zxing-android-embedded:4.3.0")
     
     // Testing
     testImplementation("junit:junit:4.13.2")

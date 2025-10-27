@@ -2,7 +2,7 @@ package com.screentime.reward.presentation.screen.role_selection
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
@@ -12,8 +12,16 @@ import com.screentime.reward.domain.model.UserRole
 
 @Composable
 fun RoleSelectionScreen(
-    onRoleSelected: (UserRole) -> Unit
+    onRoleSelected: (UserRole) -> Unit,
+    onFamilyLinkNeeded: ((UserRole) -> Unit)? = null
 ) {
+    var showFamilyLink by remember { mutableStateOf<UserRole?>(null) }
+    
+    if (showFamilyLink != null && onFamilyLinkNeeded != null) {
+        // Показываем экран связи
+        onFamilyLinkNeeded(showFamilyLink!!)
+        return
+    }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -37,7 +45,13 @@ fun RoleSelectionScreen(
         
         RoleButton(
             text = "Ребенок",
-            onClick = { onRoleSelected(UserRole.CHILD) },
+            onClick = { 
+                if (onFamilyLinkNeeded != null) {
+                    showFamilyLink = UserRole.CHILD
+                } else {
+                    onRoleSelected(UserRole.CHILD)
+                }
+            },
             modifier = Modifier.fillMaxWidth()
         )
         
@@ -45,7 +59,13 @@ fun RoleSelectionScreen(
         
         RoleButton(
             text = "Взрослый",
-            onClick = { onRoleSelected(UserRole.ADULT) },
+            onClick = {
+                if (onFamilyLinkNeeded != null) {
+                    showFamilyLink = UserRole.ADULT
+                } else {
+                    onRoleSelected(UserRole.ADULT)
+                }
+            },
             modifier = Modifier.fillMaxWidth()
         )
     }

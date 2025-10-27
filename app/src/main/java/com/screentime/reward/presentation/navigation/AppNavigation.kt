@@ -8,6 +8,7 @@ import com.screentime.reward.domain.model.UserRole
 import com.screentime.reward.presentation.screen.role_selection.RoleSelectionScreen
 import com.screentime.reward.presentation.screen.child.ChildCabinetScreen
 import com.screentime.reward.presentation.screen.adult.AdultCabinetScreen
+import com.screentime.reward.presentation.screen.family.FamilyLinkScreen
 
 @Composable
 fun AppNavigation() {
@@ -24,6 +25,30 @@ fun AppNavigation() {
                         UserRole.CHILD -> navController.navigate("child_cabinet")
                         UserRole.ADULT -> navController.navigate("adult_cabinet")
                     }
+                },
+                onFamilyLinkNeeded = { role ->
+                    navController.navigate("family_link/$role")
+                }
+            )
+        }
+        
+        composable("family_link/{role}") { backStackEntry ->
+            val roleString = backStackEntry.arguments?.getString("role") ?: "CHILD"
+            val role = when (roleString) {
+                "ADULT" -> UserRole.ADULT
+                "CHILD" -> UserRole.CHILD
+                else -> UserRole.CHILD
+            }
+            
+            var connectionCode by remember { mutableStateOf<String?>(null) }
+            
+            FamilyLinkScreen(
+                role = role,
+                connectionCode = connectionCode,
+                onCodeEntered = { code ->
+                    // Логика соединения устройств
+                    // TODO: вызывать Firebase
+                    navController.navigate("${roleString.lowercase()}_cabinet")
                 }
             )
         }
@@ -31,7 +56,9 @@ fun AppNavigation() {
         composable("child_cabinet") {
             ChildCabinetScreen(
                 onBackClick = {
-                    navController.navigate("role_selection")
+                    navController.navigate("role_selection") {
+                        popUpTo("role_selection") { inclusive = true }
+                    }
                 }
             )
         }
@@ -39,7 +66,9 @@ fun AppNavigation() {
         composable("adult_cabinet") {
             AdultCabinetScreen(
                 onBackClick = {
-                    navController.navigate("role_selection")
+                    navController.navigate("role_selection") {
+                        popUpTo("role_selection") { inclusive = true }
+                    }
                 }
             )
         }
