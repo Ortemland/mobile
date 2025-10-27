@@ -27,7 +27,7 @@ fun ChildCabinetScreen(
     onBackClick: () -> Unit,
     onLinkDevices: () -> Unit = {},
     viewModel: ChildViewModel = hiltViewModel(),
-    linkPreferences: LinkPreferences = remember { LinkPreferences(androidx.compose.ui.platform.LocalContext.current) }
+    linkPreferences: LinkPreferences = LinkPreferences(androidx.compose.ui.platform.LocalContext.current)
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var showAddDialog by remember { mutableStateOf(false) }

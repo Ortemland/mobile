@@ -72,7 +72,7 @@ fun AppNavigation() {
                 connectionCode = (100000..999999).random().toString()
             }
             
-            val linkPreferences = remember { LinkPreferences(LocalContext.current) }
+            val linkPreferences = LinkPreferences(LocalContext.current)
             val scope = rememberCoroutineScope()
             
             FamilyLinkScreen(

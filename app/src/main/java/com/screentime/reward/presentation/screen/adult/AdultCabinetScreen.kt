@@ -25,7 +25,7 @@ fun AdultCabinetScreen(
     viewModel: AdultViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val linkPreferences = remember { LinkPreferences(LocalContext.current) }
+    val linkPreferences = LinkPreferences(LocalContext.current)
     val isLinked by linkPreferences.isLinkedFlow().collectAsState(initial = false)
     
     Scaffold(
