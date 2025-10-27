@@ -32,25 +32,31 @@ fun ChildCabinetScreen(
     val linkPreferences = LinkPreferences(androidx.compose.ui.platform.LocalContext.current)
     val familyId by linkPreferences.getFamilyIdFlow().collectAsState(initial = null)
     var firebaseLinked by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+    
+    // Функция для проверки статуса связки
+    suspend fun checkConnectionStatus() {
+        val currentFamilyId = linkPreferences.getFamilyIdFlow().collectAsState(initial = null).value
+        if (currentFamilyId != null) {
+            val firebaseRepo = com.screentime.reward.data.firebase.FirebaseSyncRepository()
+            try {
+                val familySnapshot = firebaseRepo.db.collection("families")
+                    .document(currentFamilyId)
+                    .get()
+                    .await()
+                
+                val family: com.screentime.reward.domain.model.FamilyLink? = familySnapshot.toObject(com.screentime.reward.domain.model.FamilyLink::class.java)
+                firebaseLinked = family?.isActive == true
+            } catch (e: Exception) {
+                firebaseLinked = false
+            }
+        }
+    }
     
     // Проверяем статус связки в Firebase с периодическим обновлением
     LaunchedEffect(Unit) {
         while (true) {
-            val currentFamilyId = linkPreferences.getFamilyIdFlow().collectAsState(initial = null).value
-            if (currentFamilyId != null) {
-                val firebaseRepo = com.screentime.reward.data.firebase.FirebaseSyncRepository()
-                try {
-                    val familySnapshot = firebaseRepo.db.collection("families")
-                        .document(currentFamilyId)
-                        .get()
-                        .await()
-                    
-                    val family: com.screentime.reward.domain.model.FamilyLink? = familySnapshot.toObject(com.screentime.reward.domain.model.FamilyLink::class.java)
-                    firebaseLinked = family?.isActive == true
-                } catch (e: Exception) {
-                    firebaseLinked = false
-                }
-            }
+            checkConnectionStatus()
             kotlinx.coroutines.delay(2000) // Проверяем каждые 2 секунды
         }
     }
@@ -60,21 +66,7 @@ fun ChildCabinetScreen(
     // Функция принудительного обновления статуса
     val refreshConnection = {
         scope.launch {
-            val currentFamilyId = linkPreferences.getFamilyIdFlow().collectAsState(initial = null).value
-            if (currentFamilyId != null) {
-                val firebaseRepo = com.screentime.reward.data.firebase.FirebaseSyncRepository()
-                try {
-                    val familySnapshot = firebaseRepo.db.collection("families")
-                        .document(currentFamilyId)
-                        .get()
-                        .await()
-                    
-                    val family: com.screentime.reward.domain.model.FamilyLink? = familySnapshot.toObject(com.screentime.reward.domain.model.FamilyLink::class.java)
-                    firebaseLinked = family?.isActive == true
-                } catch (e: Exception) {
-                    firebaseLinked = false
-                }
-            }
+            checkConnectionStatus()
         }
     }
     
@@ -116,7 +108,7 @@ fun ChildCabinetScreen(
             Spacer(modifier = Modifier.height(8.dp))
             LinkStatusCard(
                 isLinked = isDeviceLinked,
-                onRefresh = { /* refreshConnection() */ }
+                onRefresh = refreshConnection
             )
             Spacer(modifier = Modifier.height(16.dp))
             
