@@ -70,20 +70,25 @@ fun AppNavigation() {
             // Генерируем код для взрослого, для ребенка - показываем ввод
             var connectionCode by remember { mutableStateOf<String?>(null) }
             var isLoading by remember { mutableStateOf(false) }
+            var errorMessage by remember { mutableStateOf<String?>(null) }
             
-            val firebaseRepo = FirebaseSyncRepository()
             val linkPreferences = LinkPreferences(LocalContext.current)
             val scope = rememberCoroutineScope()
             
             LaunchedEffect(role) {
                 if (role == UserRole.ADULT && connectionCode == null) {
-                    val code = firebaseRepo.generateConnectionCode()
-                    connectionCode = code
-                    // Создаем семью в Firebase
-                    scope.launch {
-                        isLoading = true
-                        firebaseRepo.createFamily(code)
-                        isLoading = false
+                    try {
+                        val firebaseRepo = FirebaseSyncRepository()
+                        val code = firebaseRepo.generateConnectionCode()
+                        connectionCode = code
+                        // Создаем семью в Firebase
+                        scope.launch {
+                            isLoading = true
+                            firebaseRepo.createFamily(code)
+                            isLoading = false
+                        }
+                    } catch (e: Exception) {
+                        errorMessage = "Ошибка: ${e.message}"
                     }
                 }
             }
@@ -92,17 +97,24 @@ fun AppNavigation() {
                 role = role,
                 connectionCode = connectionCode,
                 isLoading = isLoading,
+                errorMessage = errorMessage,
                 onCodeEntered = { code ->
                     scope.launch {
-                        isLoading = true
-                        val success = firebaseRepo.joinFamily(code)
-                        isLoading = false
-                        
-                        if (success) {
-                            linkPreferences.setLinked(true)
-                            navController.popBackStack()
-                        } else {
-                            // Показать ошибку - код неверный
+                        try {
+                            isLoading = true
+                            val firebaseRepo = FirebaseSyncRepository()
+                            val success = firebaseRepo.joinFamily(code)
+                            isLoading = false
+                            
+                            if (success) {
+                                linkPreferences.setLinked(true)
+                                navController.popBackStack()
+                            } else {
+                                errorMessage = "Код неверный или уже использован"
+                            }
+                        } catch (e: Exception) {
+                            isLoading = false
+                            errorMessage = "Ошибка: ${e.message}"
                         }
                     }
                 },

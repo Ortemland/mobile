@@ -17,6 +17,7 @@ fun FamilyLinkScreen(
     role: UserRole,
     connectionCode: String? = null,
     isLoading: Boolean = false,
+    errorMessage: String? = null,
     onCodeEntered: (String) -> Unit,
     onBack: () -> Unit = {}
 ) {
@@ -53,6 +54,21 @@ fun FamilyLinkScreen(
                 contentAlignment = Alignment.Center
             ) {
                 CircularProgressIndicator()
+            }
+        } else if (errorMessage != null) {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = errorMessage,
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.padding(16.dp)
+                )
+                Button(onClick = { onBack() }) {
+                    Text("Назад")
+                }
             }
         } else if (role == UserRole.ADULT && connectionCode != null) {
             // Взрослый видит код для связи
