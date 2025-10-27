@@ -13,6 +13,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.screentime.reward.domain.model.Task
 import com.screentime.reward.presentation.screen.adult.viewmodel.AdultViewModel
+import com.screentime.reward.presentation.screen.shared.LinkStatusCard
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -22,6 +23,7 @@ fun AdultCabinetScreen(
     viewModel: AdultViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    var isLinked by remember { mutableStateOf(false) }
     
     Scaffold(
         topBar = {
@@ -43,13 +45,18 @@ fun AdultCabinetScreen(
                 )
             )
         }
-    ) { paddingValues ->
+        ) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
                 .padding(16.dp)
         ) {
+            // Карточка статуса связи
+            Spacer(modifier = Modifier.height(8.dp))
+            LinkStatusCard(isLinked = isLinked)
+            Spacer(modifier = Modifier.height(16.dp))
+            
             Text(
                 text = "Заявки на утверждение:",
                 fontSize = 20.sp,

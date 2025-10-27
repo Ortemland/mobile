@@ -16,6 +16,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.screentime.reward.domain.model.Task
 import com.screentime.reward.domain.model.TaskStatus
 import com.screentime.reward.presentation.screen.child.viewmodel.ChildViewModel
+import com.screentime.reward.presentation.screen.shared.LinkStatusCard
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -26,6 +27,7 @@ fun ChildCabinetScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var showAddDialog by remember { mutableStateOf(false) }
+    var isLinked by remember { mutableStateOf(false) }
     
     Scaffold(
         topBar = {
@@ -54,13 +56,18 @@ fun ChildCabinetScreen(
                 Icon(Icons.Default.Add, contentDescription = "Добавить дело")
             }
         }
-    ) { paddingValues ->
+        ) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
                 .padding(16.dp)
         ) {
+            // Карточка статуса связи
+            Spacer(modifier = Modifier.height(8.dp))
+            LinkStatusCard(isLinked = isLinked)
+            Spacer(modifier = Modifier.height(16.dp))
+            
             // Карточка с доступным временем
             TimeCard(
                 timeInfo = uiState.timeInfo,
