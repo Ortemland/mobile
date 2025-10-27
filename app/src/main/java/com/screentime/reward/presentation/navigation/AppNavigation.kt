@@ -35,6 +35,9 @@ fun AppNavigation() {
                     navController.navigate("role_selection") {
                         popUpTo("role_selection") { inclusive = true }
                     }
+                },
+                onLinkDevices = {
+                    navController.navigate("family_link/CHILD")
                 }
             )
         }
@@ -45,6 +48,37 @@ fun AppNavigation() {
                     navController.navigate("role_selection") {
                         popUpTo("role_selection") { inclusive = true }
                     }
+                },
+                onLinkDevices = {
+                    navController.navigate("family_link/ADULT")
+                }
+            )
+        }
+        
+        composable("family_link/{role}") { backStackEntry ->
+            val roleString = backStackEntry.arguments?.getString("role") ?: "CHILD"
+            val role = when (roleString) {
+                "ADULT" -> UserRole.ADULT
+                "CHILD" -> UserRole.CHILD
+                else -> UserRole.CHILD
+            }
+            
+            // Генерируем код для взрослого, для ребенка - показываем ввод
+            var connectionCode by remember { mutableStateOf<String?>(null) }
+            if (role == UserRole.ADULT && connectionCode == null) {
+                connectionCode = (100000..999999).random().toString()
+            }
+            
+            FamilyLinkScreen(
+                role = role,
+                connectionCode = connectionCode,
+                onCodeEntered = { code ->
+                    // TODO: Логика связки устройств через Firebase
+                    // После успешной связки вернуться в кабинет
+                    navController.popBackStack()
+                },
+                onBack = {
+                    navController.popBackStack()
                 }
             )
         }

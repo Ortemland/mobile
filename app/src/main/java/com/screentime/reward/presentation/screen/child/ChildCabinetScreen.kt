@@ -21,6 +21,7 @@ import com.screentime.reward.presentation.screen.child.viewmodel.ChildViewModel
 @Composable
 fun ChildCabinetScreen(
     onBackClick: () -> Unit,
+    onLinkDevices: () -> Unit = {},
     viewModel: ChildViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -31,8 +32,8 @@ fun ChildCabinetScreen(
             TopAppBar(
                 title = { Text("Кабинет ребенка") },
                 navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Text("Назад")
+                    TextButton(onClick = onBackClick) {
+                        Text("Назад", color = MaterialTheme.colorScheme.onPrimary)
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(

@@ -18,6 +18,7 @@ import com.screentime.reward.presentation.screen.adult.viewmodel.AdultViewModel
 @Composable
 fun AdultCabinetScreen(
     onBackClick: () -> Unit,
+    onLinkDevices: () -> Unit = {},
     viewModel: AdultViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -27,8 +28,13 @@ fun AdultCabinetScreen(
             TopAppBar(
                 title = { Text("Кабинет взрослого") },
                 navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Text("Назад")
+                    TextButton(onClick = onBackClick) {
+                        Text("Назад", color = MaterialTheme.colorScheme.onPrimary)
+                    }
+                },
+                actions = {
+                    TextButton(onClick = onLinkDevices) {
+                        Text("Связать", color = MaterialTheme.colorScheme.onPrimary)
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(

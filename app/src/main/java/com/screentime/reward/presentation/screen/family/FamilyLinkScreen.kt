@@ -16,7 +16,8 @@ import com.screentime.reward.domain.model.UserRole
 fun FamilyLinkScreen(
     role: UserRole,
     connectionCode: String? = null,
-    onCodeEntered: (String) -> Unit
+    onCodeEntered: (String) -> Unit,
+    onBack: () -> Unit = {}
 ) {
     Scaffold(
         topBar = {
