@@ -81,7 +81,7 @@ fun AppNavigation() {
             LaunchedEffect(Unit) {
                 if (role == UserRole.ADULT && connectionCode == null) {
                     try {
-                        val firebaseRepo = FirebaseSyncRepository()
+                        val firebaseRepo = FirebaseSyncRepository(LocalContext.current)
                         val code = firebaseRepo.generateConnectionCode()
                         connectionCode = code
                         
@@ -105,7 +105,7 @@ fun AppNavigation() {
                     scope.launch {
                         try {
                             isLoading = true
-                            val firebaseRepo = FirebaseSyncRepository()
+                            val firebaseRepo = FirebaseSyncRepository(LocalContext.current)
                             val success = firebaseRepo.joinFamily(code)
                             
                             if (success) {
