@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Награда за дела</string>
+    
+    <!-- Common -->
+    <string name="child_role">Ребенок</string>
+    <string name="adult_role">Взрослый</string>
+    <string name="select_role">Выберите роль</string>
+    
+    <!-- Child -->
+    <string name="child_cabinet">Кабинет ребенка</string>
+    <string name="available_time">Доступно времени</string>
+    <string name="my_tasks">Мои дела</string>
+    <string name="add_task">Добавить дело</string>
+    <string name="task_name">Название дела</string>
+    <string name="time_minutes">Время (минуты)</string>
+    <string name="submit_task">Отправить на утверждение</string>
+    <string name="pending_approval">Ожидает утверждения</string>
+    <string name="approved">Утверждено</string>
+    <string name="rejected">Отклонено</string>
+    
+    <!-- Adult -->
+    <string name="adult_cabinet">Кабинет взрослого</string>
+    <string name="approval_requests">Заявки на утверждение</string>
+    <string name="approve">Утвердить</string>
+    <string name="reject">Отклонить</string>
+    
+    <!-- Settings -->
+    <string name="base_time">Базовое время (часы)</string>
+    <string name="save">Сохранить</string>
+</resources>
+
