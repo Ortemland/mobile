@@ -18,6 +18,7 @@ import com.screentime.reward.domain.model.TaskStatus
 import com.screentime.reward.presentation.screen.child.viewmodel.ChildViewModel
 import com.screentime.reward.presentation.screen.shared.LinkStatusCard
 import com.screentime.reward.data.preferences.LinkPreferences
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
 @OptIn(ExperimentalMaterial3Api::class)
