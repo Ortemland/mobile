@@ -84,7 +84,11 @@ fun AppNavigation() {
                         // Создаем семью в Firebase
                         scope.launch {
                             isLoading = true
-                            firebaseRepo.createFamily(code)
+                            firebaseRepo.createFamily(code) { familyId ->
+                                // Сохраняем familyId для взрослого
+                                linkPreferences.setFamilyId(familyId)
+                                linkPreferences.setLinked(true)
+                            }
                             isLoading = false
                         }
                     } catch (e: Exception) {
@@ -107,6 +111,7 @@ fun AppNavigation() {
                             isLoading = false
                             
                             if (success) {
+                                // После успешной связки, status уже установлен в Firebase
                                 linkPreferences.setLinked(true)
                                 navController.popBackStack()
                             } else {

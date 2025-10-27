@@ -4,7 +4,7 @@
     <selectionStates>
       <SelectionState runConfigName="ScreenTimeReward.app">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2025-10-27T16:02:00.813240Z">
+        <DropdownSelection timestamp="2025-10-27T16:10:56.352787Z">
           <Target type="DEFAULT_BOOT">
             <handle>
               <DeviceId pluginId="LocalEmulator" identifier="path=/Users/artemsocnev/.android/avd/Medium_Phone.avd" />

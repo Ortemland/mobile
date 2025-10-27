@@ -21,7 +21,7 @@ class FirebaseSyncRepository @Inject constructor() {
     }
     
     // Создать семью (взрослый создает)
-    suspend fun createFamily(connectionCode: String): FamilyLink {
+    suspend fun createFamily(connectionCode: String, onSuccess: (String) -> Unit = {}) {
         val familyId = db.collection("families").document().id
         val familyLink = FamilyLink(
             familyId = familyId,
@@ -32,11 +32,11 @@ class FirebaseSyncRepository @Inject constructor() {
         )
         
         db.collection("families")
-            .document(familyLink.familyId)
+            .document(familyId)
             .set(familyLink)
             .await()
         
-        return familyLink
+        onSuccess(familyId)
     }
     
     // Присоединиться к семье (ребенок вводит код)
@@ -61,57 +61,47 @@ class FirebaseSyncRepository @Inject constructor() {
         
         // Обновляем связь, добавляя ID ребенка
         familyDoc.reference.update(
-            "childDeviceId", getCurrentDeviceId(),
-            "isActive", true
+            mapOf(
+                "childDeviceId" to getCurrentDeviceId(),
+                "isActive" to true
+            )
         ).await()
         
         return true
     }
     
     // Отправить задачу на утверждение в Firebase
-    suspend fun submitTaskForApproval(task: PendingApproval) {
-        val familyId = getCurrentFamilyId()
-        if (familyId != null) {
-            db.collection("families")
-                .document(familyId)
-                .collection("pendingApprovals")
-                .document(task.taskId)
-                .set(task)
-                .await()
-        }
+    suspend fun submitTaskForApproval(task: PendingApproval, familyId: String) {
+        db.collection("families")
+            .document(familyId)
+            .collection("pendingApprovals")
+            .document(task.taskId)
+            .set(task)
+            .await()
     }
     
     // Утвердить задачу из Firebase
-    suspend fun approveTask(taskId: String) {
-        val familyId = getCurrentFamilyId()
-        if (familyId != null) {
-            db.collection("families")
-                .document(familyId)
-                .collection("pendingApprovals")
-                .document(taskId)
-                .update("status", "approved")
-                .await()
-        }
+    suspend fun approveTask(taskId: String, familyId: String) {
+        db.collection("families")
+            .document(familyId)
+            .collection("pendingApprovals")
+            .document(taskId)
+            .update("status", "approved")
+            .await()
     }
     
     // Отклонить задачу из Firebase
-    suspend fun rejectTask(taskId: String) {
-        val familyId = getCurrentFamilyId()
-        if (familyId != null) {
-            db.collection("families")
-                .document(familyId)
-                .collection("pendingApprovals")
-                .document(taskId)
-                .update("status", "rejected")
-                .await()
-        }
+    suspend fun rejectTask(taskId: String, familyId: String) {
+        db.collection("families")
+            .document(familyId)
+            .collection("pendingApprovals")
+            .document(taskId)
+            .update("status", "rejected")
+            .await()
     }
     
     // Получить все заявки на утверждение
-    suspend fun getPendingApprovals(): List<PendingApproval> {
-        val familyId = getCurrentFamilyId()
-        if (familyId == null) return emptyList()
-        
+    suspend fun getPendingApprovals(familyId: String): List<PendingApproval> {
         val query = db.collection("families")
             .document(familyId)
             .collection("pendingApprovals")
@@ -129,11 +119,4 @@ class FirebaseSyncRepository @Inject constructor() {
         // В реальном приложении используй Settings.Secure.ANDROID_ID
         return java.util.UUID.randomUUID().toString()
     }
-    
-    // Получить ID текущей семьи (нужно хранить в SharedPreferences)
-    private fun getCurrentFamilyId(): String? {
-        // Тут нужно получить из SharedPreferences
-        return null
-    }
 }
-
