@@ -10,6 +10,7 @@ import com.screentime.reward.presentation.screen.child.ChildCabinetScreen
 import com.screentime.reward.presentation.screen.adult.AdultCabinetScreen
 import com.screentime.reward.presentation.screen.family.FamilyLinkScreen
 import com.screentime.reward.data.preferences.LinkPreferences
+import com.screentime.reward.data.firebase.FirebaseSyncRepository
 import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.launch
 
@@ -68,22 +69,42 @@ fun AppNavigation() {
             
             // Генерируем код для взрослого, для ребенка - показываем ввод
             var connectionCode by remember { mutableStateOf<String?>(null) }
-            if (role == UserRole.ADULT && connectionCode == null) {
-                connectionCode = (100000..999999).random().toString()
-            }
+            var isLoading by remember { mutableStateOf(false) }
             
+            val firebaseRepo = FirebaseSyncRepository()
             val linkPreferences = LinkPreferences(LocalContext.current)
             val scope = rememberCoroutineScope()
+            
+            LaunchedEffect(role) {
+                if (role == UserRole.ADULT && connectionCode == null) {
+                    val code = firebaseRepo.generateConnectionCode()
+                    connectionCode = code
+                    // Создаем семью в Firebase
+                    scope.launch {
+                        isLoading = true
+                        firebaseRepo.createFamily(code)
+                        isLoading = false
+                    }
+                }
+            }
             
             FamilyLinkScreen(
                 role = role,
                 connectionCode = connectionCode,
+                isLoading = isLoading,
                 onCodeEntered = { code ->
-                    // Логика связки устройств
                     scope.launch {
-                        linkPreferences.setLinked(true)
+                        isLoading = true
+                        val success = firebaseRepo.joinFamily(code)
+                        isLoading = false
+                        
+                        if (success) {
+                            linkPreferences.setLinked(true)
+                            navController.popBackStack()
+                        } else {
+                            // Показать ошибку - код неверный
+                        }
                     }
-                    navController.popBackStack()
                 },
                 onBack = {
                     navController.popBackStack()

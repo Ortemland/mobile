@@ -16,6 +16,7 @@ import com.screentime.reward.domain.model.UserRole
 fun FamilyLinkScreen(
     role: UserRole,
     connectionCode: String? = null,
+    isLoading: Boolean = false,
     onCodeEntered: (String) -> Unit,
     onBack: () -> Unit = {}
 ) {
@@ -46,14 +47,21 @@ fun FamilyLinkScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
     ) {
-        if (role == UserRole.ADULT && connectionCode != null) {
+        if (isLoading) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        } else if (role == UserRole.ADULT && connectionCode != null) {
             // Взрослый видит код для связи
             AdultConnectionCodeView(connectionCode = connectionCode, onBack = onBack)
-            } else if (role == UserRole.CHILD) {
-                // Ребенок вводит код
-                ChildCodeInputView(onCodeEntered = onCodeEntered)
-            }
+        } else if (role == UserRole.CHILD) {
+            // Ребенок вводит код
+            ChildCodeInputView(onCodeEntered = onCodeEntered)
         }
+    }
     }
 }
 
