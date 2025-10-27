@@ -39,7 +39,8 @@ fun ChildCabinetScreen(
     suspend fun checkConnectionStatus() {
         val currentFamilyId = linkPreferences.getFamilyId()
         if (currentFamilyId != null) {
-            val firebaseRepo = com.screentime.reward.data.firebase.FirebaseSyncRepository()
+            val contextForRepo = androidx.compose.ui.platform.LocalContext.current
+            val firebaseRepo = com.screentime.reward.data.firebase.FirebaseSyncRepository(contextForRepo)
             try {
                 val familySnapshot = firebaseRepo.db.collection("families")
                     .document(currentFamilyId)
