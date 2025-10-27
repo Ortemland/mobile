@@ -7,13 +7,15 @@ import com.screentime.reward.domain.model.FamilyLink
 import com.screentime.reward.domain.model.PendingApproval
 import com.screentime.reward.domain.model.DeviceRole
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class FirebaseSyncRepository @Inject constructor() {
     
-    private val db: FirebaseFirestore = Firebase.firestore
+    val db: FirebaseFirestore = Firebase.firestore
     
     // Генерация случайного кода связки (6 цифр)
     fun generateConnectionCode(): String {

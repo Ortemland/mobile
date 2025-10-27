@@ -11,8 +11,10 @@ import com.screentime.reward.presentation.screen.adult.AdultCabinetScreen
 import com.screentime.reward.presentation.screen.family.FamilyLinkScreen
 import com.screentime.reward.data.preferences.LinkPreferences
 import com.screentime.reward.data.firebase.FirebaseSyncRepository
+import com.screentime.reward.domain.model.FamilyLink
 import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 @Composable
 fun AppNavigation() {
@@ -111,8 +113,24 @@ fun AppNavigation() {
                             isLoading = false
                             
                             if (success) {
-                                // После успешной связки, status уже установлен в Firebase
+                                // После успешной связки сохраняем статус
                                 linkPreferences.setLinked(true)
+                                
+                                // Получаем familyId из Firebase для ребенка
+                                val firebaseRepo2 = FirebaseSyncRepository()
+                                val query = firebaseRepo2.db.collection("families")
+                                    .whereEqualTo("connectionCode", code)
+                                    .limit(1)
+                                    .get()
+                                    .await()
+                                
+                                if (!query.isEmpty) {
+                                    val family = query.documents.first().toObject(FamilyLink::class.java)
+                                    if (family != null) {
+                                        linkPreferences.setFamilyId(family.familyId)
+                                    }
+                                }
+                                
                                 navController.popBackStack()
                             } else {
                                 errorMessage = "Код неверный или уже использован"
